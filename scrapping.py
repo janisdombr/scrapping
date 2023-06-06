@@ -12,16 +12,18 @@ from firebase_admin import firestore
 cred = credentials.Certificate("/Users/janisdombr/Desktop/SpbRent/flipperlab-bdabe-firebase-adminsdk-8kaua-a84cbdde54.json")
 app = firebase_admin.initialize_app(cred)
 firestore_client = firestore.client()
+collection = "asunnot.oikotie.fi"; # asunnot.oikotie.fi-rent # КОЛЛЕКЦИЯ FIREBASE
 
-
+# ССЫЛКА НА ОБЪЯВЛЕНИЯ, ПЕРЕХОДИШЬ И СМОТРИШЬ СКОЛЬКО СТРАНИЦ ОБЪЯВЛЕНИЙ
 baseurl = "https://asunnot.oikotie.fi/vuokra-asunnot?locations=%5B%5B39,6,%22Espoo%22%5D%5D&cardType=101&pagination="
 
 
 service = ChromeService(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service)
-delay = 30 # seconds
-startpage = 130
-endpage = 131
+delay = 30 # seconds МАКСИМАЛЬНАЯ ЗАДЕРЖКА, СКОЛЬКО СКРИПТ ЖДЕТ ПОКА ПОДГРУЖАТСЯ ДАННЫЕ САЙТА
+startpage = 0 # НАЧАЛЬНАЯ СТРАНИЦА ОТКУДА ГРАБИТЬ (по идее 1, но если ты застопорился на какой-то странице, то можешь продолжить с этой страницы)
+endpage = 124 # КОНЕЧНАЯ СТРАНИЦА, НУЖНО ПЕРЕД ЗАПУСКОМ ПОСМОТРЕТЬ СКОЛЬКО ВСЕГО
+
 for page in range(startpage, endpage+1):
     url = baseurl + str(page)
     #driver = webdriver.Firefox()
@@ -95,6 +97,6 @@ for page in range(startpage, endpage+1):
                     u'price': int(price),
                     u'square': float(square)
                 }
-                firestore_client.collection(u'asunnot.oikotie.fi-rent').document(ad_id).set(data)
+                firestore_client.collection(collection).document(ad_id).set(data)
     except TimeoutException:
         print ("Couldn't load page")
